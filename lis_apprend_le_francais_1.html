@@ -1,0 +1,868 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Lis aprende francés 🇫🇷</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:ital,wght@0,400;0,500;1,400&display=swap');
+
+:root {
+  --accent: #e85d4a;
+  --accent2: #c9a84c;
+  --bg: #fdf8f0;
+  --card: #ffffff;
+  --text: #1a1a2e;
+  --muted: #6b6b7a;
+  --border: rgba(0,0,0,0.1);
+  --success: #2d8c4e;
+  --fail: #c0392b;
+  --info: #1a6fa8;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+html, body { height: 100%; font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); font-size: 16px; }
+
+/* ── NAVIGATION ── */
+#app { display: flex; flex-direction: column; min-height: 100vh; }
+#nav { background: var(--card); border-bottom: 0.5px solid var(--border); padding: 12px 16px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 10; }
+#nav h1 { font-family: 'Playfair Display', serif; font-size: 1.2rem; color: var(--accent); }
+#nav .progress-pill { font-size: 12px; color: var(--muted); background: var(--bg); padding: 4px 10px; border-radius: 20px; border: 0.5px solid var(--border); }
+
+#content { flex: 1; padding: 16px; max-width: 600px; margin: 0 auto; width: 100%; }
+
+/* ── HOME ── */
+.home-header { text-align: center; padding: 24px 0 20px; }
+.home-header h2 { font-family: 'Playfair Display', serif; font-size: 1.8rem; color: var(--accent); }
+.home-header p { color: var(--muted); font-size: 14px; margin-top: 6px; line-height: 1.5; }
+.unit-list { display: flex; flex-direction: column; gap: 10px; }
+.unit-card { background: var(--card); border: 0.5px solid var(--border); border-radius: 16px; padding: 16px; display: flex; align-items: center; gap: 14px; cursor: pointer; transition: transform 0.15s; active: scale(0.98); }
+.unit-card:active { transform: scale(0.97); }
+
+.unit-icon { width: 48px; height: 48px; border-radius: 12px; background: var(--bg); display: flex; align-items: center; justify-content: center; font-size: 24px; flex-shrink: 0; }
+.unit-info { flex: 1; }
+.unit-info h3 { font-size: 15px; font-weight: 500; }
+.unit-info p { font-size: 12px; color: var(--muted); margin-top: 2px; }
+.unit-badge { font-size: 11px; padding: 3px 8px; border-radius: 20px; font-weight: 500; }
+.badge-new { background: #e8f7ed; color: var(--success); }
+.badge-done { background: #e8f7ed; color: var(--success); }
+.badge-lock { background: var(--bg); color: var(--muted); border: 0.5px solid var(--border); }
+.unit-bar { height: 3px; background: var(--border); border-radius: 2px; margin-top: 6px; }
+.unit-bar-fill { height: 100%; background: var(--accent); border-radius: 2px; transition: width 0.5s; }
+
+/* ── LESSON ── */
+.lesson-header { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
+.back-btn { background: none; border: 0.5px solid var(--border); border-radius: 10px; padding: 8px 14px; font-size: 14px; cursor: pointer; color: var(--muted); font-family: inherit; }
+.lesson-title { font-family: 'Playfair Display', serif; font-size: 1.2rem; }
+.lesson-subtitle { font-size: 13px; color: var(--muted); margin-top: 2px; }
+.progress-bar { height: 5px; background: var(--border); border-radius: 3px; margin-bottom: 20px; }
+.progress-fill { height: 100%; background: var(--accent); border-radius: 3px; transition: width 0.4s; }
+
+/* ── CARDS DE VOCABULARIO ── */
+.vocab-grid { display: flex; flex-direction: column; gap: 10px; }
+.vocab-card { background: var(--card); border: 0.5px solid var(--border); border-radius: 14px; padding: 14px 16px; }
+.vocab-card .fr { font-size: 1.3rem; font-weight: 500; color: var(--accent); display: flex; align-items: center; gap: 10px; }
+.vocab-card .phonetic { font-size: 12px; color: var(--muted); font-style: italic; margin: 2px 0 4px; }
+.vocab-card .es { font-size: 14px; color: var(--text); }
+.vocab-card .example { font-size: 13px; color: var(--muted); margin-top: 6px; font-style: italic; border-left: 2px solid var(--border); padding-left: 8px; }
+.speak-btn { background: none; border: none; cursor: pointer; padding: 4px; color: var(--accent); font-size: 20px; flex-shrink: 0; }
+.speak-btn:active { opacity: 0.6; }
+.next-lesson-btn { width: 100%; margin-top: 16px; background: var(--accent); color: white; border: none; border-radius: 14px; padding: 16px; font-size: 16px; font-family: inherit; font-weight: 500; cursor: pointer; }
+.next-lesson-btn:active { opacity: 0.85; }
+
+/* ── ÉCOUTE ── */
+.listen-card { background: var(--card); border: 0.5px solid var(--border); border-radius: 16px; padding: 20px; margin-bottom: 12px; text-align: center; }
+.listen-card .big-play { width: 64px; height: 64px; border-radius: 50%; background: var(--accent); border: none; color: white; font-size: 24px; cursor: pointer; margin: 0 auto 12px; display: flex; align-items: center; justify-content: center; }
+.listen-card .big-play:active { opacity: 0.8; }
+.listen-card .phrase { font-size: 1.1rem; font-weight: 500; color: var(--text); margin-bottom: 6px; }
+.listen-card .reveal { font-size: 14px; color: var(--muted); cursor: pointer; text-decoration: underline; }
+.reveal-text { display: none; margin-top: 8px; font-size: 15px; color: var(--info); font-weight: 500; }
+.reveal-text.show { display: block; }
+.listen-options { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 12px; }
+.listen-opt { background: var(--card); border: 1.5px solid var(--border); border-radius: 12px; padding: 12px; font-size: 14px; cursor: pointer; font-family: inherit; color: var(--text); text-align: center; transition: all 0.15s; }
+.listen-opt:active { transform: scale(0.96); }
+.listen-opt.correct { border-color: var(--success); background: #e8f7ed; color: var(--success); }
+.listen-opt.wrong { border-color: var(--fail); background: #fceaea; color: var(--fail); }
+
+/* ── PRONONCIATION ── */
+.pronun-card { background: var(--card); border: 0.5px solid var(--border); border-radius: 16px; padding: 20px; margin-bottom: 12px; }
+.pronun-card .target { font-size: 1.5rem; font-weight: 500; color: var(--accent); text-align: center; margin-bottom: 4px; }
+.pronun-card .phonetic-big { text-align: center; font-size: 14px; color: var(--muted); font-style: italic; margin-bottom: 12px; }
+.pronun-tip { background: #fff8e6; border-left: 3px solid var(--accent2); border-radius: 0 8px 8px 0; padding: 10px 12px; font-size: 13px; color: #7a5c00; margin: 10px 0; }
+.pronun-tip strong { font-weight: 500; }
+.sound-row { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+.sound-chip { background: var(--bg); border: 0.5px solid var(--border); border-radius: 20px; padding: 8px 14px; font-size: 14px; cursor: pointer; display: flex; align-items: center; gap: 6px; }
+.sound-chip:active { background: var(--accent); color: white; }
+
+/* ── QCM ── */
+.question-box { background: var(--card); border: 0.5px solid var(--border); border-radius: 16px; padding: 18px; margin-bottom: 12px; }
+.question-text { font-size: 1.05rem; font-weight: 500; margin-bottom: 6px; }
+.question-hint { font-size: 13px; color: var(--muted); }
+.options-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px; }
+.opt-btn { background: var(--card); border: 1.5px solid var(--border); border-radius: 12px; padding: 14px 16px; font-size: 15px; cursor: pointer; text-align: left; font-family: inherit; color: var(--text); transition: all 0.15s; }
+.opt-btn:active { transform: scale(0.98); }
+.opt-btn.correct { border-color: var(--success); background: #e8f7ed; color: var(--success); }
+.opt-btn.wrong { border-color: var(--fail); background: #fceaea; color: var(--fail); }
+.opt-btn:disabled { cursor: default; }
+.feedback-box { border-radius: 12px; padding: 12px 16px; font-size: 14px; margin-bottom: 12px; line-height: 1.5; }
+.feedback-box.ok { background: #e8f7ed; color: #1a5c34; }
+.feedback-box.ko { background: #fceaea; color: #7a1a1a; }
+
+/* ── FILL-IN ── */
+.fill-sentence { font-size: 1.2rem; font-weight: 500; text-align: center; margin: 10px 0 16px; line-height: 1.6; }
+.fill-sentence .blank { color: var(--accent); border-bottom: 2px solid var(--accent); min-width: 80px; display: inline-block; }
+.fill-input { border: 1.5px solid var(--border); border-radius: 12px; padding: 12px 16px; font-size: 16px; width: 100%; font-family: inherit; background: var(--card); color: var(--text); }
+.fill-input:focus { outline: none; border-color: var(--accent); }
+.fill-input.ok { border-color: var(--success); background: #e8f7ed; }
+.fill-input.ko { border-color: var(--fail); background: #fceaea; }
+.check-btn { width: 100%; margin-top: 8px; background: var(--text); color: white; border: none; border-radius: 12px; padding: 14px; font-size: 15px; font-family: inherit; cursor: pointer; }
+
+/* ── CONVERSATION ── */
+.convo-scene { background: var(--card); border: 0.5px solid var(--border); border-radius: 16px; padding: 16px; margin-bottom: 12px; }
+.convo-scene .scene-label { font-size: 12px; color: var(--muted); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
+.bubble { display: flex; gap: 8px; margin-bottom: 10px; align-items: flex-end; }
+.bubble.right { flex-direction: row-reverse; }
+.avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--bg); display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
+.bubble-text { max-width: 75%; background: var(--bg); border-radius: 14px 14px 14px 4px; padding: 10px 14px; font-size: 14px; line-height: 1.4; }
+.bubble.right .bubble-text { background: var(--accent); color: white; border-radius: 14px 14px 4px 14px; }
+.bubble-fr { font-weight: 500; }
+.bubble-es { font-size: 12px; color: var(--muted); margin-top: 3px; font-style: italic; }
+.bubble.right .bubble-es { color: rgba(255,255,255,0.75); }
+.convo-play-btn { display: flex; align-items: center; gap: 6px; background: none; border: 0.5px solid var(--border); border-radius: 8px; padding: 4px 10px; font-size: 12px; cursor: pointer; color: var(--muted); margin-top: 4px; font-family: inherit; }
+
+/* ── SCORE FINAL ── */
+.end-screen { text-align: center; padding: 2rem 0; }
+.end-score { font-family: 'Playfair Display', serif; font-size: 3.5rem; color: var(--accent); }
+.end-msg { color: var(--muted); font-size: 15px; margin: 8px 0 24px; line-height: 1.5; }
+.end-btns { display: flex; flex-direction: column; gap: 10px; }
+.end-btn { padding: 16px; border-radius: 14px; font-size: 15px; font-family: inherit; cursor: pointer; border: none; font-weight: 500; }
+.end-btn.primary { background: var(--accent); color: white; }
+.end-btn.secondary { background: var(--card); color: var(--text); border: 0.5px solid var(--border); }
+
+/* ── INTRO UNIT ── */
+.intro-section { background: var(--card); border: 0.5px solid var(--border); border-radius: 16px; padding: 20px; margin-bottom: 12px; }
+.intro-section h3 { font-size: 1rem; font-weight: 500; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+.intro-section p { font-size: 14px; color: var(--muted); line-height: 1.6; margin-bottom: 8px; }
+.compare-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+.compare-table th { text-align: left; font-size: 12px; color: var(--muted); font-weight: 500; padding: 6px 8px; border-bottom: 0.5px solid var(--border); }
+.compare-table td { padding: 8px 8px; border-bottom: 0.5px solid var(--border); }
+.compare-table td:first-child { color: var(--muted); }
+.compare-table .fr-cell { color: var(--accent); font-weight: 500; }
+.tag { display: inline-block; font-size: 11px; padding: 2px 8px; border-radius: 20px; font-weight: 500; margin-left: 6px; }
+.tag.new { background: #e8f7ed; color: var(--success); }
+.tag.tip { background: #fff8e6; color: #7a5c00; }
+
+/* ── TABS ── */
+.tabs { display: flex; gap: 6px; margin-bottom: 16px; overflow-x: auto; padding-bottom: 2px; }
+.tab-btn { background: var(--card); border: 0.5px solid var(--border); border-radius: 20px; padding: 6px 14px; font-size: 13px; cursor: pointer; font-family: inherit; color: var(--muted); white-space: nowrap; }
+.tab-btn.active { background: var(--accent); color: white; border-color: var(--accent); }
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="nav">
+    <h1>🇫🇷 Lis aprende francés</h1>
+    <span class="progress-pill" id="xp-display">0 XP</span>
+  </div>
+  <div id="content"></div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════
+// SYNTHÈSE VOCALE
+// ═══════════════════════════════════════════════
+function speak(text, rate) {
+  if (!window.speechSynthesis) return;
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = 'fr-FR';
+  u.rate = rate || 0.85;
+  u.pitch = 1;
+  // Chercher une voix française
+  const voices = speechSynthesis.getVoices();
+  const frVoice = voices.find(v => v.lang.startsWith('fr'));
+  if (frVoice) u.voice = frVoice;
+  speechSynthesis.speak(u);
+}
+// Charger les voix
+if (window.speechSynthesis) speechSynthesis.getVoices();
+window.speechSynthesis && window.speechSynthesis.addEventListener && window.speechSynthesis.addEventListener('voiceschanged', () => {});
+
+// ═══════════════════════════════════════════════
+// ÉTAT GLOBAL
+// ═══════════════════════════════════════════════
+const state = {
+  xp: parseInt(localStorage.getItem('lis_xp') || '0'),
+  progress: JSON.parse(localStorage.getItem('lis_progress') || '{}'),
+  screen: 'home',
+  currentUnit: null,
+  currentStep: 0,
+  score: 0,
+  answered: false,
+};
+
+function saveState() {
+  localStorage.setItem('lis_xp', state.xp);
+  localStorage.setItem('lis_progress', JSON.stringify(state.progress));
+}
+
+function addXP(n) {
+  state.xp += n;
+  saveState();
+  document.getElementById('xp-display').textContent = state.xp + ' XP';
+}
+
+// ═══════════════════════════════════════════════
+// DONNÉES DES UNITÉS
+// ═══════════════════════════════════════════════
+const UNITS = [
+  {
+    id: 'u1', icon: '👋', title: 'Primeras palabras',
+    desc: 'Saludar, presentarse, los números',
+    steps: ['intro','vocab','listen','pronun','quiz','conversation','fill','end'],
+    intro: {
+      title: 'Bienvenida al francés',
+      sections: [
+        { icon: '🎯', title: 'Lo que aprenderás', html: `<p>En esta unidad vas a aprender a saludar, presentarte y contar del 1 al 10. Son las bases absolutas.</p>` },
+        { icon: '🔊', title: 'Cómo suena el francés', html: `<p>El francés tiene sonidos que no existen en español. El más famoso: la <strong>U francesa</strong> — di "i" pero con los labios en forma de "o". Toca el botón para escuchar.</p>`, audio: ['Tu', 'Du', 'Sur', 'Rue'] },
+        { icon: '⚠️', title: 'La liaison', html: `<p>En francés, cuando una palabra termina en consonante y la siguiente empieza con vocal, se unen al pronunciar. Ej: <em>vous_avez</em> se dice "voo-za-veh".</p>` },
+      ]
+    },
+    vocab: [
+      { fr: 'Bonjour', ph: 'bon-JOOR', es: 'Buenos días / Hola (formal)', ex: 'Bonjour, je m\'appelle Lis.' },
+      { fr: 'Bonsoir', ph: 'bon-SWAR', es: 'Buenas noches (al llegar)', ex: 'Bonsoir ! Comment ça va ?' },
+      { fr: 'Salut', ph: 'sa-LU', es: 'Hola / chao (informal)', ex: 'Salut ! Tu vas bien ?' },
+      { fr: 'Au revoir', ph: 'o-ruh-VWAR', es: 'Hasta luego', ex: 'Au revoir, à demain !' },
+      { fr: 'Merci', ph: 'mer-SEE', es: 'Gracias', ex: 'Merci beaucoup !' },
+      { fr: 'S\'il vous plaît', ph: 'sil-voo-PLEH', es: 'Por favor (formal)', ex: 'Un café, s\'il vous plaît.' },
+      { fr: 'Oui / Non', ph: 'WEE / NON', es: 'Sí / No', ex: 'Oui, j\'aime le café !' },
+      { fr: 'Je m\'appelle...', ph: 'juh ma-PEL', es: 'Me llamo...', ex: 'Je m\'appelle Lis, et toi ?' },
+      { fr: 'Enchanté(e)', ph: 'on-shon-TEH', es: 'Encantado/a de conocerte', ex: 'Je m\'appelle Marie. — Enchanté !' },
+      { fr: 'Comment ça va ?', ph: 'ko-MON sa VA', es: '¿Cómo estás?', ex: 'Bonjour ! Comment ça va ? — Ça va bien, merci !' },
+    ],
+    listen: [
+      { audio: 'Bonjour !', opts: ['¡Hola!', '¡Hasta luego!', '¡Gracias!', '¡Por favor!'], correct: 0 },
+      { audio: 'Au revoir !', opts: ['¡Buenas noches!', '¡Hasta luego!', '¡Encantada!', '¡Hola!'], correct: 1 },
+      { audio: 'Merci beaucoup !', opts: ['¿Cómo te llamas?', '¿Cómo estás?', 'Muchas gracias', 'De nada'], correct: 2 },
+      { audio: 'Comment ça va ?', opts: ['¡Hasta luego!', 'Me llamo Lis', '¿Cómo estás?', '¡Gracias!'], correct: 2 },
+      { audio: 'Je m\'appelle Lis.', opts: ['Tengo hambre', 'Me llamo Lis', 'Soy de Chile', 'Me gusta Francia'], correct: 1 },
+    ],
+    pronun: [
+      { word: 'Bonjour', ph: 'bon-JOOR', tip: 'La "on" es nasal — el sonido sale por la nariz. No digas "bon-jour" como en inglés. Di "bon" tapándote la nariz.', sounds: ['Bon', 'Bonjour', 'Bonsoir'] },
+      { word: 'Au revoir', ph: 'o-ruh-VWAR', tip: '"Au" suena como una "o" larga. "revoir" — la "r" francesa viene de la garganta, como si hicieras gárgaras suaves.', sounds: ['Au', 'Revoir', 'Au revoir'] },
+      { word: 'S\'il vous plaît', ph: 'sil-voo-PLEH', tip: '"Plaît" — la "t" final NO se pronuncia. En francés, las consonantes finales casi nunca suenan.', sounds: ['S\'il', 'Vous', 'Plaît', 'S\'il vous plaît'] },
+    ],
+    quiz: [
+      { q: '¿Cómo se dice "Hola" de forma informal entre amigos?', opts: ['Bonjour', 'Bonsoir', 'Salut', 'Au revoir'], correct: 2, expl: 'SALUT es el hola informal. BONJOUR es más formal o para desconocidos.' },
+      { q: '"Enchanté" se usa cuando...', opts: ['Te despides', 'Conoces a alguien por primera vez', 'Pides algo en un café', 'No entiendes algo'], correct: 1, expl: 'ENCHANTÉ(E) = encantado de conocerte. Se dice al presentarse.' },
+      { q: '¿Qué significa "Comment ça va ?" ?', opts: ['¿Cómo te llamas?', '¿De dónde eres?', '¿Cuántos años tienes?', '¿Cómo estás?'], correct: 3, expl: 'COMMENT ÇA VA = ¿cómo estás? La respuesta típica: "Ça va bien, merci !"' },
+      { q: '"S\'il vous plaît" es...', opts: ['Por favor (formal)', 'Por favor (informal)', 'Gracias', 'De nada'], correct: 0, expl: 'S\'IL VOUS PLAÎT = por favor (formal). Con amigos se dice "s\'il te plaît".' },
+      { q: '¿Cuál de estas palabras es nasal (suena por la nariz)?', opts: ['Salut', 'Merci', 'Bonjour', 'Oui'], correct: 2, expl: 'BON-jour — la "on" es un sonido nasal. ¡Muy característico del francés!' },
+    ],
+    conversation: {
+      scene: '☕ En un café parisino',
+      bubbles: [
+        { who: 'garçon', avatar: '🧑‍🍳', fr: 'Bonjour ! Vous désirez ?', es: '¡Buenos días! ¿Qué desea?' },
+        { who: 'lis', avatar: '👩', fr: 'Bonjour ! Un café, s\'il vous plaît.', es: '¡Buenos días! Un café, por favor.' },
+        { who: 'garçon', avatar: '🧑‍🍳', fr: 'Très bien. Autre chose ?', es: 'Muy bien. ¿Algo más?' },
+        { who: 'lis', avatar: '👩', fr: 'Non merci, c\'est tout.', es: 'No gracias, es todo.' },
+        { who: 'garçon', avatar: '🧑‍🍳', fr: 'Voilà ! Bonne journée !', es: '¡Aquí tiene! ¡Que tenga buen día!' },
+        { who: 'lis', avatar: '👩', fr: 'Merci, au revoir !', es: '¡Gracias, hasta luego!' },
+      ]
+    },
+    fill: [
+      { sentence: '_____, je m\'appelle Lis.', blank: 'Bonjour', hint: 'Saludo formal para empezar', expl: 'BONJOUR es el saludo estándar en francés para cualquier situación formal.' },
+      { sentence: 'Un café, _____ !', blank: 's\'il vous plaît', hint: 'Pedir algo educadamente', expl: 'S\'IL VOUS PLAÎT siempre al final de un pedido en un café o tienda.' },
+      { sentence: 'Comment _____ va ?', blank: 'ça', hint: '"ça" significa "eso" / "ello"', expl: 'COMMENT ÇA VA — literalmente "¿cómo eso va?" — la forma de preguntar cómo estás.' },
+      { sentence: '_____, à bientôt !', blank: 'Au revoir', hint: 'Despedida estándar', expl: 'AU REVOIR = hasta luego. À bientôt = hasta pronto.' },
+    ]
+  },
+
+  {
+    id: 'u2', icon: '🔢', title: 'Números y tiempo',
+    desc: 'Del 1 al 100, horas, días y meses',
+    steps: ['intro','vocab','listen','pronun','quiz','conversation','fill','end'],
+    intro: {
+      title: 'Números y tiempo',
+      sections: [
+        { icon: '🔢', title: 'Los números franceses', html: `<p>Los números del 1 al 16 son únicos. Del 17 al 19 son combinaciones (dix-sept = 10+7). Los números 70, 80 y 90 son los más extraños del francés.</p>` },
+        { icon: '⚠️', title: '¡Cuidado con 70, 80 y 90!', html: `<p><strong>70 = soixante-dix</strong> (literalmente: 60+10)<br><strong>80 = quatre-vingts</strong> (literalmente: 4×20)<br><strong>90 = quatre-vingt-dix</strong> (literalmente: 4×20+10)<br>Sí, es así. Los franceses llevan siglos así 😄</p>` },
+        { icon: '🕐', title: 'La hora en francés', html: `<p>El francés usa el formato de 24h en lo oficial, pero en conversación normal dice "il est deux heures de l'après-midi" (son las 2 de la tarde). La media hora: "et demie". El cuarto: "et quart".</p>` },
+      ]
+    },
+    vocab: [
+      { fr: 'Un, deux, trois', ph: 'un, duh, trwa', es: 'Uno, dos, tres', ex: 'Un, deux, trois — partez !' },
+      { fr: 'Quatre, cinq, six', ph: 'katr, sank, sees', es: 'Cuatro, cinco, seis', ex: 'Six café, s\'il vous plaît.' },
+      { fr: 'Sept, huit, neuf, dix', ph: 'set, weet, nuhf, dees', es: 'Siete, ocho, nueve, diez', ex: 'J\'ai dix euros.' },
+      { fr: 'Vingt / Trente', ph: 'van / tront', es: 'Veinte / Treinta', ex: 'J\'ai vingt ans.' },
+      { fr: 'Cinquante / Cent', ph: 'sank-ont / son', es: 'Cincuenta / Cien', ex: 'Cent euros, c\'est cher !' },
+      { fr: 'Lundi, mardi, mercredi', ph: 'lun-DEE, mar-DEE, mer-kruh-DEE', es: 'Lunes, martes, miércoles', ex: 'On se retrouve lundi ?' },
+      { fr: 'Jeudi, vendredi', ph: 'juh-DEE, von-druh-DEE', es: 'Jueves, viernes', ex: 'Le vendredi, c\'est le meilleur jour !' },
+      { fr: 'Samedi, dimanche', ph: 'sam-DEE, dee-MONSH', es: 'Sábado, domingo', ex: 'Ce dimanche, je me repose.' },
+      { fr: 'Quelle heure est-il ?', ph: 'kel ur eh-TEEL', es: '¿Qué hora es?', ex: 'Quelle heure est-il ? — Il est trois heures.' },
+      { fr: 'Aujourd\'hui / Demain', ph: 'o-joor-DWEE / duh-MAN', es: 'Hoy / Mañana', ex: 'Aujourd\'hui il fait beau. Demain ? On verra.' },
+    ],
+    listen: [
+      { audio: 'Il est trois heures.', opts: ['Son las tres', 'Son las cuatro', 'Son las trece', 'Son las dos'], correct: 0 },
+      { audio: 'Aujourd\'hui, c\'est lundi.', opts: ['Hoy es domingo', 'Hoy es martes', 'Hoy es lunes', 'Hoy es viernes'], correct: 2 },
+      { audio: 'J\'ai vingt-cinq ans.', opts: ['Tengo 15 años', 'Tengo 20 años', 'Tengo 25 años', 'Tengo 35 años'], correct: 2 },
+      { audio: 'Le rendez-vous est vendredi.', opts: ['La cita es el miércoles', 'La cita es el viernes', 'La cita es el lunes', 'La cita es mañana'], correct: 1 },
+      { audio: 'Cent euros, s\'il vous plaît.', opts: ['Cincuenta euros', 'Diez euros', 'Cien euros', 'Treinta euros'], correct: 2 },
+    ],
+    pronun: [
+      { word: 'Deux / Neuf', ph: 'duh / nuhf', tip: 'La "eu" francesa — labios en "o" pero lengua como para decir "e". Es el sonido más difícil para hispanohablantes.', sounds: ['Deux', 'Neuf', 'Heure', 'Peur'] },
+      { word: 'Vingt', ph: 'van', tip: '¡La "g" y la "t" son mudas! VINGT se pronuncia simplemente "van". Las consonantes finales raramente suenan.', sounds: ['Vingt', 'Cent', 'Temps', 'Vingt et un'] },
+      { word: 'Aujourd\'hui', ph: 'o-joor-dwee', tip: 'Esta palabra larga se dice de corrido. Divide: au-jour-d\'hui. La "u" final es la u francesa (labios en "o", lengua en "i").', sounds: ['Au', 'Jour', 'Aujourd\'hui'] },
+    ],
+    quiz: [
+      { q: '¿Cómo se dice 70 en francés?', opts: ['Septante', 'Soixante-dix', 'Soixante-dix-sept', 'Septième'], correct: 1, expl: '70 = SOIXANTE-DIX (60+10). Bélgica y Suiza dicen "septante", pero no en Francia.' },
+      { q: '¿Qué día es "mercredi"?', opts: ['Martes', 'Jueves', 'Miércoles', 'Viernes'], correct: 2, expl: 'MERCREDI = miércoles. Viene de Mercure (Mercurio). Lundi=lunes, Mardi=martes, Mercredi=miércoles.' },
+      { q: '"Il est midi" significa...', opts: ['Es medianoche', 'Es mediodía', 'Son las 11', 'Son las 12 de la noche'], correct: 1, expl: 'MIDI = mediodía. MINUIT = medianoche. Son dos palabras distintas.' },
+      { q: '¿Cómo se pregunta la hora?', opts: ['Quel temps fait-il ?', 'Quelle heure est-il ?', 'Quand est-ce ?', 'Combien d\'heures ?'], correct: 1, expl: 'QUELLE HEURE EST-IL ? = ¿Qué hora es? "Quel temps" pregunta el clima, no la hora.' },
+      { q: '"Demain" significa...', opts: ['Ayer', 'Hoy', 'Mañana', 'Pasado mañana'], correct: 2, expl: 'DEMAIN = mañana. HIER = ayer. AUJOURD\'HUI = hoy.' },
+    ],
+    conversation: {
+      scene: '📱 Por teléfono — haciendo una cita',
+      bubbles: [
+        { who: 'ami', avatar: '👨', fr: 'Allô ! Tu es disponible demain ?', es: '¿Aló! ¿Estás disponible mañana?' },
+        { who: 'lis', avatar: '👩', fr: 'Demain... c\'est quel jour ?', es: 'Mañana... ¿qué día es?' },
+        { who: 'ami', avatar: '👨', fr: 'Demain c\'est samedi.', es: 'Mañana es sábado.' },
+        { who: 'lis', avatar: '👩', fr: 'Oui ! À quelle heure ?', es: '¡Sí! ¿A qué hora?' },
+        { who: 'ami', avatar: '👨', fr: 'À trois heures de l\'après-midi ?', es: '¿A las tres de la tarde?' },
+        { who: 'lis', avatar: '👩', fr: 'Parfait ! À demain alors !', es: '¡Perfecto! ¡Hasta mañana entonces!' },
+      ]
+    },
+    fill: [
+      { sentence: 'J\'ai _____ ans.', blank: 'vingt', hint: '¿Cuántos años tiene Lis? Usa "vingt" (20)', expl: 'VINGT = 20. Se pronuncia "van" — la gt es muda.' },
+      { sentence: '_____, c\'est lundi.', blank: 'Aujourd\'hui', hint: 'La palabra para "hoy"', expl: 'AUJOURD\'HUI = hoy. Une de las palabras más largas del francés cotidiano.' },
+      { sentence: 'Il est _____ heures.', blank: 'trois', hint: 'Son las tres', expl: 'TROIS = tres. Il est trois heures = son las tres.' },
+      { sentence: 'On se retrouve _____?', blank: 'demain', hint: 'La palabra para "mañana"', expl: 'DEMAIN = mañana. "On se retrouve demain ?" = ¿Nos vemos mañana?' },
+    ]
+  },
+
+  {
+    id: 'u3', icon: '🧠', title: 'Verbos esenciales',
+    desc: 'Être, avoir, aller, vouloir — el núcleo del francés',
+    steps: ['intro','vocab','listen','pronun','quiz','conversation','fill','end'],
+    intro: {
+      title: 'Los 4 verbos más importantes',
+      sections: [
+        { icon: '⚡', title: 'Por qué estos 4 verbos', html: `<p>Con ÊTRE (ser/estar), AVOIR (tener), ALLER (ir) y VOULOIR (querer), puedes sobrevivir en Francia. Son irregulares, pero son tan frecuentes que los aprenderás sin darte cuenta.</p>` },
+        { icon: '⚠️', title: 'ÊTRE = ser Y estar', html: `<p>En francés no existe la distinción entre ser y estar. ÊTRE hace los dos papeles.<br><br>Je suis fatiguée = <em>Estoy</em> cansada.<br>Je suis chilienne = <em>Soy</em> chilena.<br>Je suis à Paris = <em>Estoy</em> en París.</p>` },
+        { icon: '🔄', title: 'AVOIR para la edad', html: `<p>Como en español ("tengo 25 años"), el francés también <em>tiene</em> edad con AVOIR. Nunca digas "je suis 25 ans".</p><table class="compare-table"><tr><th>Español</th><th>Francés</th></tr><tr><td>Tengo frío</td><td class="fr-cell">J'ai froid</td></tr><tr><td>Tengo hambre</td><td class="fr-cell">J'ai faim</td></tr><tr><td>Tengo miedo</td><td class="fr-cell">J'ai peur</td></tr><tr><td>Tengo suerte</td><td class="fr-cell">J'ai de la chance</td></tr></table>` },
+      ]
+    },
+    vocab: [
+      { fr: 'Je suis / Tu es', ph: 'juh SWEE / tu EH', es: 'Yo soy / Tú eres', ex: 'Je suis chilienne. Tu es français ?' },
+      { fr: 'Il/Elle est', ph: 'il/el EH', es: 'Él/Ella es/está', ex: 'Elle est très sympa !' },
+      { fr: 'Nous sommes', ph: 'noo SOM', es: 'Nosotros somos', ex: 'Nous sommes en France !' },
+      { fr: 'J\'ai / Tu as', ph: 'jay / tu A', es: 'Yo tengo / Tú tienes', ex: 'J\'ai faim. Tu as de l\'argent ?' },
+      { fr: 'Je vais / Tu vas', ph: 'juh VEH / tu VA', es: 'Yo voy / Tú vas', ex: 'Je vais au marché. Tu vas bien ?' },
+      { fr: 'Je veux / Je voudrais', ph: 'juh VUH / juh voo-DREH', es: 'Quiero / Quisiera', ex: 'Je veux apprendre. Je voudrais un café.' },
+      { fr: 'Je sais / Je connais', ph: 'juh SEH / juh ko-NEH', es: 'Sé (un hecho) / Conozco (a alguien)', ex: 'Je sais parler espagnol. Je connais Paris.' },
+      { fr: 'Je peux', ph: 'juh PUH', es: 'Puedo', ex: 'Je peux t\'aider !' },
+      { fr: 'Je dois', ph: 'juh DWA', es: 'Debo / Tengo que', ex: 'Je dois partir. À plus !' },
+      { fr: 'Je vais + infinitif', ph: 'juh veh + infinitif', es: 'Voy a + infinitivo (futuro próximo)', ex: 'Je vais manger. Il va pleuvoir.' },
+    ],
+    listen: [
+      { audio: 'Je suis très fatiguée.', opts: ['Tengo mucho sueño', 'Estoy muy cansada', 'Tengo mucha hambre', 'Estoy muy bien'], correct: 1 },
+      { audio: 'Tu as faim ?', opts: ['¿Tienes frío?', '¿Tienes sed?', '¿Tienes hambre?', '¿Tienes miedo?'], correct: 2 },
+      { audio: 'Je vais au marché.', opts: ['Voy al cine', 'Voy al mercado', 'Voy a casa', 'Voy al trabajo'], correct: 1 },
+      { audio: 'Je voudrais un café, s\'il vous plaît.', opts: ['Quiero agua', 'Quiero un vino', 'Quisiera un café', 'Quisiera un té'], correct: 2 },
+      { audio: 'Nous sommes en France !', opts: ['¡Estamos en España!', '¡Estamos en Chile!', '¡Vamos a Francia!', '¡Estamos en Francia!'], correct: 3 },
+    ],
+    pronun: [
+      { word: 'Je suis', ph: 'juh SWEE', tip: '"Je" suena como "juh" muy corto, casi mudo. La "j" es suave como en "garage". Nunca como la "j" española.', sounds: ['Je', 'Je suis', 'Je vais', 'Je voudrais'] },
+      { word: 'Vous / Nous', ph: 'voo / noo', tip: 'La "ou" en francés es una "u" española normal. Nunca es la u francesa. VOUS = voo, NOUS = noo.', sounds: ['Vous', 'Nous', 'Bonjour', 'Voudrais'] },
+      { word: 'Vouloir', ph: 'voo-LWAR', tip: '"Vouloir" termina en "-oir" que suena "war". Igual: voir = "vwar", avoir = "a-vwar".', sounds: ['Vouloir', 'Voir', 'Avoir', 'Pouvoir'] },
+    ],
+    quiz: [
+      { q: '¿Cómo se dice "Estoy en París"?', opts: ['J\'ai à Paris', 'Je suis à Paris', 'Je vais à Paris', 'J\'habite Paris'], correct: 1, expl: 'JE SUIS À PARIS = estoy en París. ÊTRE se usa tanto para ser como para estar.' },
+      { q: '"J\'ai peur" significa...', opts: ['Tengo frío', 'Tengo hambre', 'Tengo miedo', 'Tengo sed'], correct: 2, expl: 'J\'AI PEUR = tengo miedo. Como en español, se "tiene" miedo en francés.' },
+      { q: 'Para decir "voy a comer" en francés se dice...', opts: ['Je mange', 'J\'irai manger', 'Je vais manger', 'Je mange aller'], correct: 2, expl: 'Je VAIS MANGER = voy a comer. Futuro próximo: ALLER + infinitivo. Igual que en español.' },
+      { q: '¿Cuál es la diferencia entre JE VEUX y JE VOUDRAIS?', opts: ['No hay diferencia', 'VEUX es presente, VOUDRAIS es futuro', 'VEUX es directo, VOUDRAIS es más educado', 'VOUDRAIS es informal'], correct: 2, expl: 'VOUDRAIS (condicional) = quisiera — más educado. En cafés y tiendas, usa siempre JE VOUDRAIS.' },
+      { q: '"Je dois partir" significa...', opts: ['Quiero irme', 'Puedo irme', 'Me voy yendo', 'Tengo que irme'], correct: 3, expl: 'JE DOIS = tengo que, debo. DEVOIR expresa obligación, como "deber" en español.' },
+    ],
+    conversation: {
+      scene: '🛒 En una tienda',
+      bubbles: [
+        { who: 'vendeur', avatar: '🧑‍💼', fr: 'Bonjour ! Je peux vous aider ?', es: '¡Buenos días! ¿Puedo ayudarla?' },
+        { who: 'lis', avatar: '👩', fr: 'Bonjour ! Je voudrais ce sac, s\'il vous plaît.', es: 'Buenos días! Quisiera esa bolsa, por favor.' },
+        { who: 'vendeur', avatar: '🧑‍💼', fr: 'Bien sûr. Vous avez la carte ?', es: 'Por supuesto. ¿Tiene tarjeta?' },
+        { who: 'lis', avatar: '👩', fr: 'Oui, j\'ai ma carte bleue.', es: 'Sí, tengo mi tarjeta de crédito.' },
+        { who: 'vendeur', avatar: '🧑‍💼', fr: 'Parfait. Voilà, bonne journée !', es: 'Perfecto. Aquí tiene, ¡buen día!' },
+        { who: 'lis', avatar: '👩', fr: 'Merci ! Au revoir !', es: '¡Gracias! ¡Hasta luego!' },
+      ]
+    },
+    fill: [
+      { sentence: 'Je _____ chilienne.', blank: 'suis', hint: 'ÊTRE, primera persona', expl: 'JE SUIS = soy/estoy. Formas de ÊTRE: suis, es, est, sommes, êtes, sont.' },
+      { sentence: 'Tu _____ faim ?', blank: 'as', hint: 'AVOIR, segunda persona', expl: 'TU AS = tú tienes. J\'ai faim = tengo hambre.' },
+      { sentence: 'Je _____ aller au cinéma.', blank: 'veux', hint: 'VOULOIR, primera persona', expl: 'JE VEUX = quiero. Je voudrais es más educado.' },
+      { sentence: 'Nous _____ à Paris.', blank: 'sommes', hint: 'ÊTRE, primera persona plural', expl: 'NOUS SOMMES = nosotros somos/estamos. Très bien !' },
+    ]
+  },
+
+  {
+    id: 'u4', icon: '🗣️', title: 'Hablar de ti',
+    desc: 'Nacionalidad, trabajo, gustos — conversación real',
+    steps: ['intro','vocab','listen','pronun','quiz','conversation','fill','end'],
+    intro: {
+      title: 'Presentarte y hablar de ti',
+      sections: [
+        { icon: '🌍', title: 'Nationalités', html: `<p>En francés, la nacionalidad concuerda en género. El femenino generalmente añade una -e al masculino.</p><table class="compare-table"><tr><th>País</th><th>Masculino</th><th>Femenino</th></tr><tr><td>France</td><td class="fr-cell">Français</td><td class="fr-cell">Française</td></tr><tr><td>Espagne</td><td class="fr-cell">Espagnol</td><td class="fr-cell">Espagnole</td></tr><tr><td>Chili</td><td class="fr-cell">Chilien</td><td class="fr-cell">Chilienne</td></tr><tr><td>Italie</td><td class="fr-cell">Italien</td><td class="fr-cell">Italienne</td></tr></table>` },
+        { icon: '❤️', title: 'Expresar gustos', html: `<p>El verbo clave: AIMER (amar/gustar).<br><strong>J\'aime</strong> = me gusta mucho / amo<br><strong>J\'adore</strong> = me encanta<br><strong>Je n\'aime pas</strong> = no me gusta<br><strong>Je déteste</strong> = odio<br><br>Con verbos, usar el infinitivo: J\'aime <em>voyager</em>.</p>` },
+        { icon: '🔧', title: 'La negación', html: `<p>Para negar en francés se pone <strong>ne</strong> antes del verbo y <strong>pas</strong> después.<br>Je parle → Je <strong>ne</strong> parle <strong>pas</strong>.<br><br>En el habla informal, el "ne" suele desaparecer:<br>"Je parle pas" = normal en conversación.</p>` },
+      ]
+    },
+    vocab: [
+      { fr: 'Je suis chilienne', ph: 'juh swee shi-LYEN', es: 'Soy chilena', ex: 'Je suis chilienne, de Santiago.' },
+      { fr: 'J\'habite à...', ph: 'ja-BEET a', es: 'Vivo en...', ex: 'J\'habite à Paris depuis deux ans.' },
+      { fr: 'Je travaille comme...', ph: 'juh tra-VYE kom', es: 'Trabajo como...', ex: 'Je travaille comme professeure.' },
+      { fr: 'J\'aime / J\'adore', ph: 'JEM / ja-DOR', es: 'Me gusta / Me encanta', ex: 'J\'aime le vin. J\'adore le chocolat !' },
+      { fr: 'Je n\'aime pas', ph: 'juh nem PA', es: 'No me gusta', ex: 'Je n\'aime pas le froid.' },
+      { fr: 'Je parle...', ph: 'juh PARL', es: 'Hablo...', ex: 'Je parle espagnol et français.' },
+      { fr: 'Tu viens d\'où ?', ph: 'tu vyan DOO', es: '¿De dónde eres?', ex: 'Tu viens d\'où ? — Je viens du Chili.' },
+      { fr: 'Qu\'est-ce que tu fais ?', ph: 'kes-kuh tu FEH', es: '¿A qué te dedicas?', ex: 'Qu\'est-ce que tu fais dans la vie ?' },
+      { fr: 'Depuis combien de temps ?', ph: 'duh-PWEE kom-BYAN duh TON', es: '¿Desde hace cuánto tiempo?', ex: 'Je suis à Paris depuis 3 mois.' },
+      { fr: 'Je ne comprends pas', ph: 'juh nuh kom-PRON PA', es: 'No entiendo', ex: 'Pardon, je ne comprends pas. Pouvez-vous répéter ?' },
+    ],
+    listen: [
+      { audio: 'Je viens du Chili.', opts: ['Vivo en Chile', 'Vengo de Chile', 'Me gusta Chile', 'Voy a Chile'], correct: 1 },
+      { audio: 'J\'adore le chocolat.', opts: ['Me gusta un poco el chocolate', 'No me gusta el chocolate', 'Me encanta el chocolate', 'Como chocolate'], correct: 2 },
+      { audio: 'Je ne comprends pas.', opts: ['No hablo francés', 'No me gusta', 'No entiendo', 'No puedo hablar'], correct: 2 },
+      { audio: 'Tu viens d\'où ?', opts: ['¿Cómo te llamas?', '¿Cuántos años tienes?', '¿Dónde vives?', '¿De dónde eres?'], correct: 3 },
+      { audio: 'Je travaille comme ingénieure.', opts: ['Estudio ingeniería', 'Soy profesora', 'Trabajo como ingeniera', 'Me gusta la ingeniería'], correct: 2 },
+    ],
+    pronun: [
+      { word: 'J\'habite', ph: 'ja-BEET', tip: 'La "h" en francés es siempre muda. HABITE = "a-beet". Nunca se aspira. Même chose: heure, homme, hôtel.', sounds: ['Habite', 'J\'habite', 'Heure', 'Homme'] },
+      { word: 'Je n\'aime pas', ph: 'juh nem pa', tip: 'La negación "ne...pas" — en el habla informal el "ne" casi siempre desaparece. "J\'aime pas" = perfectamente normal.', sounds: ['J\'aime', 'J\'aime pas', 'Je ne parle pas', 'Je parle pas'] },
+      { word: 'Depuis', ph: 'duh-PWEE', tip: '"Depuis" suena "duh-pwee". La "ui" francesa es un sonido glide rápido. Otros: nuit = "nwee", lui = "lwee".', sounds: ['Depuis', 'Nuit', 'Lui', 'Depuis longtemps'] },
+    ],
+    quiz: [
+      { q: '¿Cómo dice una mujer "Soy francesa"?', opts: ['Je suis français', 'Je suis française', 'Je suis france', 'Je suis de France'], correct: 1, expl: 'FRANÇAISE (con -e final) es el femenino. FRANÇAIS (sin -e) es el masculino.' },
+      { q: '"Je ne comprends pas" — en el habla informal sería...', opts: ['Je comprends non', 'Comprends pas moi', 'Je comprends pas', 'Non comprends'], correct: 2, expl: 'En conversación, el "ne" desaparece frecuentemente. "Je comprends pas" es perfectamente natural.' },
+      { q: '¿Cómo se pregunta "¿A qué te dedicas?"?', opts: ['Qu\'est-ce que tu aimes ?', 'Qu\'est-ce que tu fais ?', 'Qu\'est-ce que tu veux ?', 'Qui es-tu ?'], correct: 1, expl: 'QU\'EST-CE QUE TU FAIS ? = ¿Qué haces? / ¿A qué te dedicas? FAIS viene del verbo FAIRE (hacer).' },
+      { q: '"J\'habite à Paris depuis deux ans" significa...', opts: ['Viví en París dos años', 'Voy a vivir en París dos años', 'Vivo en París desde hace dos años', 'Me gusta París desde hace dos años'], correct: 2, expl: 'DEPUIS = desde hace. Muy importante: con DEPUIS se usa el presente en francés, no el pasado.' },
+      { q: 'Para decir "me encanta" en francés:', opts: ['J\'aime beaucoup', 'J\'adore', 'Je veux bien', 'J\'apprécie'], correct: 1, expl: 'J\'ADORE es más fuerte que J\'AIME. J\'AIME = me gusta. J\'ADORE = me encanta / adoro.' },
+    ],
+    conversation: {
+      scene: '🎉 En una fiesta — conociendo gente nueva',
+      bubbles: [
+        { who: 'lucas', avatar: '👨', fr: 'Salut ! Je m\'appelle Lucas. Et toi ?', es: '¡Hola! Me llamo Lucas. ¿Y tú?' },
+        { who: 'lis', avatar: '👩', fr: 'Salut ! Je m\'appelle Lis. Je suis chilienne.', es: '¡Hola! Me llamo Lis. Soy chilena.' },
+        { who: 'lucas', avatar: '👨', fr: 'Ah cool ! Tu habites à Paris depuis longtemps ?', es: '¡Ah genial! ¿Vives en París desde hace mucho?' },
+        { who: 'lis', avatar: '👩', fr: 'Depuis six mois. Et toi, tu fais quoi ?', es: 'Desde hace seis meses. ¿Y tú, a qué te dedicas?' },
+        { who: 'lucas', avatar: '👨', fr: 'Je travaille dans un restaurant. Tu aimes la cuisine française ?', es: 'Trabajo en un restaurante. ¿Te gusta la cocina francesa?' },
+        { who: 'lis', avatar: '👩', fr: 'J\'adore ! Surtout les croissants !', es: '¡Me encanta! ¡Sobre todo los croissants!' },
+      ]
+    },
+    fill: [
+      { sentence: 'Je _____ à Santiago.', blank: 'habite', hint: 'Verbo para "vivir" — HABITER', expl: 'J\'HABITE = vivo. Recuerda que la "h" es muda.' },
+      { sentence: 'Je _____ du Chili.', blank: 'viens', hint: 'Verbo VENIR, primera persona', expl: 'JE VIENS DE = vengo de. Tu viens d\'où ? — Je viens du Chili.' },
+      { sentence: 'Je n\'aime _____ le froid.', blank: 'pas', hint: 'La segunda parte de la negación', expl: 'NE...PAS = la negación. Je n\'aime PAS = no me gusta.' },
+      { sentence: 'Je parle _____ et français.', blank: 'espagnol', hint: 'Tu idioma natal en francés', expl: 'ESPAGNOL = español. Je parle espagnol et (un peu de) français !' },
+    ]
+  },
+
+  {
+    id: 'u5', icon: '🍽️', title: 'Comer y beber',
+    desc: 'Pedir en un café, restaurante, mercado',
+    steps: ['intro','vocab','listen','quiz','conversation','fill','end'],
+    intro: {
+      title: 'La comida — tema sagrado en Francia',
+      sections: [
+        { icon: '☕', title: 'El ritual del café', html: `<p>En Francia, "un café" es siempre un expreso. Si quieres lo que bebes en Chile, pide "un café allongé" o "un café américain". El "café crème" es espresso con leche espumada.</p>` },
+        { icon: '🥐', title: 'Vocabulario esencial', html: `<p>Algunos alimentos clave que todo el mundo conoce en francés:<br><strong>pain</strong> (pan), <strong>baguette</strong>, <strong>fromage</strong> (queso), <strong>beurre</strong> (mantequilla), <strong>vin</strong> (vino), <strong>eau</strong> (agua), <strong>viande</strong> (carne), <strong>poulet</strong> (pollo).</p>` },
+        { icon: '💶', title: 'Pagar la cuenta', html: `<p>"L\'addition, s\'il vous plaît" = la cuenta, por favor. Nunca digas "la factura" — eso es "la facture" y suena a factura de empresa, no a cuenta de restaurante.</p>` },
+      ]
+    },
+    vocab: [
+      { fr: 'Je voudrais commander', ph: 'juh voo-dreh ko-mon-DEH', es: 'Quisiera pedir / ordenar', ex: 'Je voudrais commander, s\'il vous plaît.' },
+      { fr: 'L\'addition, s\'il vous plaît', ph: 'la-dee-SYON sil-voo-PLEH', es: 'La cuenta, por favor', ex: 'L\'addition, s\'il vous plaît !' },
+      { fr: 'C\'est délicieux !', ph: 'seh deh-lee-SYUH', es: '¡Está delicioso!', ex: 'Mmm, c\'est vraiment délicieux !' },
+      { fr: 'Je suis allergique à...', ph: 'juh swee a-ler-JHEEK a', es: 'Soy alérgica a...', ex: 'Je suis allergique aux noix.' },
+      { fr: 'Qu\'est-ce que vous recommandez ?', ph: 'kes-kuh voo ruh-ko-mon-DEH', es: '¿Qué recomienda?', ex: 'C\'est votre première visite ? Qu\'est-ce que vous recommandez ?' },
+      { fr: 'C\'est combien ?', ph: 'seh kom-BYAN', es: '¿Cuánto cuesta?', ex: 'C\'est combien, le menu du jour ?' },
+      { fr: 'Une carafe d\'eau', ph: 'un ka-RAF do', es: 'Una jarra de agua', ex: 'Une carafe d\'eau, s\'il vous plaît. C\'est gratuit en France !' },
+      { fr: 'Sans gluten / végétarien', ph: 'son glu-TEN / veh-jheh-ta-RYAN', es: 'Sin gluten / vegetariano', ex: 'Avez-vous un menu végétarien ?' },
+      { fr: 'C\'est trop salé / sucré', ph: 'seh tro sa-LEH / su-KREH', es: 'Está muy salado / dulce', ex: 'Excusez-moi, c\'est un peu trop salé.' },
+      { fr: 'Bon appétit !', ph: 'bon a-peh-TEE', es: '¡Buen provecho!', ex: '— Bon appétit ! — Merci, vous aussi !' },
+    ],
+    listen: [
+      { audio: 'L\'addition, s\'il vous plaît !', opts: ['¿Qué hay de postre?', 'La carta, por favor', 'La cuenta, por favor', '¿Tiene mesa libre?'], correct: 2 },
+      { audio: 'C\'est délicieux !', opts: ['¡Está frío!', '¡Está delicioso!', '¡Está picante!', '¡Está salado!'], correct: 1 },
+      { audio: 'Bon appétit !', opts: ['¡Buen viaje!', '¡Buenas noches!', '¡Buen provecho!', '¡Buena suerte!'], correct: 2 },
+      { audio: 'C\'est combien, s\'il vous plaît ?', opts: ['¿Qué recomienda?', '¿Tiene mesa?', '¿Cuánto cuesta?', '¿Es picante?'], correct: 2 },
+      { audio: 'Je suis végétarienne.', opts: ['Soy alérgica', 'Soy vegetariana', 'No como carne', 'Me gusta la ensalada'], correct: 1 },
+    ],
+    quiz: [
+      { q: '¿Cómo se pide la cuenta en un restaurante?', opts: ['La facture, s\'il vous plaît', 'Le ticket, s\'il vous plaît', 'L\'addition, s\'il vous plaît', 'Le reçu, s\'il vous plaît'], correct: 2, expl: 'L\'ADDITION = la cuenta del restaurante. "La facture" es para facturas de empresa.' },
+      { q: 'En Francia, "un café" es...', opts: ['Un café con leche', 'Un café de filtro grande', 'Un expreso pequeño', 'Un café frío'], correct: 2, expl: 'UN CAFÉ en France = siempre un expreso. Para algo más grande pide "un café allongé" o "un grand café".' },
+      { q: '¿Cómo preguntas el precio de algo?', opts: ['Ça coûte quoi ?', 'C\'est combien ?', 'Ça fait combien d\'euros ?', 'Le prix, s\'il vous plaît'], correct: 1, expl: 'C\'EST COMBIEN ? = ¿cuánto es? / ¿cuánto cuesta? Es la forma más natural y directa.' },
+      { q: '"Une carafe d\'eau" es especial en Francia porque...', opts: ['Es muy cara', 'Es obligatoria', 'Es gratuita en los restaurantes', 'Viene con gas'], correct: 2, expl: 'En France, l\'eau du robinet (en jarra) es GRATUITA en todos los restaurantes. ¡Solo tienes que pedirla!' },
+      { q: '"Qu\'est-ce que vous recommandez ?" se dice para...', opts: ['Pedir la carta', 'Preguntar el precio', 'Pedir una recomendación al mesero', 'Llamar al mesero'], correct: 2, expl: 'QU\'EST-CE QUE VOUS RECOMMANDEZ ? = ¿Qué recomienda usted? Muy útil cuando no sabes qué pedir.' },
+    ],
+    conversation: {
+      scene: '🍷 En un restaurante — cena',
+      bubbles: [
+        { who: 'serveur', avatar: '🧑‍🍳', fr: 'Bonsoir ! Vous avez choisi ?', es: '¡Buenas noches! ¿Han elegido?' },
+        { who: 'lis', avatar: '👩', fr: 'Bonsoir ! Qu\'est-ce que vous recommandez ?', es: '¡Buenas noches! ¿Qué recomienda usted?' },
+        { who: 'serveur', avatar: '🧑‍🍳', fr: 'Aujourd\'hui, le saumon est excellent.', es: 'Hoy el salmón está excelente.' },
+        { who: 'lis', avatar: '👩', fr: 'Parfait ! Je voudrais le saumon et une carafe d\'eau, s\'il vous plaît.', es: '¡Perfecto! Quisiera el salmón y una jarra de agua, por favor.' },
+        { who: 'serveur', avatar: '🧑‍🍳', fr: 'Très bien. Bon appétit !', es: 'Muy bien. ¡Buen provecho!' },
+        { who: 'lis', avatar: '👩', fr: 'Merci ! Et... l\'addition, s\'il vous plaît !', es: '¡Gracias! Y... ¡la cuenta, por favor!' },
+      ]
+    },
+    fill: [
+      { sentence: 'Je voudrais _____, s\'il vous plaît.', blank: 'commander', hint: 'Querer pedir/ordenar', expl: 'JE VOUDRAIS COMMANDER = quisiera ordenar. Siempre con "s\'il vous plaît".' },
+      { sentence: 'C\'est vraiment _____!', blank: 'délicieux', hint: 'Para decir que está buenísimo', expl: 'DÉLICIEUX = delicioso. Femenino: délicieuse. "C\'est vraiment délicieux !" = ¡Está realmente delicioso!' },
+      { sentence: 'L\'_____, s\'il vous plaît.', blank: 'addition', hint: 'La cuenta del restaurante', expl: 'L\'ADDITION = la cuenta. El artículo L\' porque "addition" empieza con vocal.' },
+      { sentence: 'Une _____ d\'eau, s\'il vous plaît.', blank: 'carafe', hint: 'Una jarra — y es gratis en Francia', expl: 'UNE CARAFE D\'EAU = una jarra de agua del grifo. Gratuita en todos los restaurantes de France.' },
+    ]
+  },
+
+  {
+    id: 'u6', icon: '🚇', title: 'Ciudad y transporte',
+    desc: 'Pedir direcciones, metro, tiendas',
+    steps: ['intro','vocab','listen','quiz','conversation','fill','end'],
+    intro: {
+      title: 'Moverse por la ciudad',
+      sections: [
+        { icon: '🗺️', title: 'Preguntar el camino', html: `<p>La frase clave: <strong>"Excusez-moi, où est...?"</strong> (Perdone, ¿dónde está...?). Siempre empieza con "excusez-moi" — los franceses aprecian la educación.</p>` },
+        { icon: '🚇', title: 'El metro de París', html: `<p>El metro se llama "le métro". Para comprar: "un ticket, s\'il vous plaît". El ticket se llama "t+" oficialmente. Los parisinos dicen simplemente "un ticket" o "un carnet" (talonario de 10).</p>` },
+        { icon: '📍', title: 'Ubicaciones clave', html: `<p><strong>la gare</strong> = la estación de tren<br><strong>l\'aéroport</strong> = el aeropuerto<br><strong>la pharmacie</strong> = la farmacia (siempre una cruz verde)<br><strong>les toilettes</strong> = el baño<br><strong>le centre-ville</strong> = el centro de la ciudad</p>` },
+      ]
+    },
+    vocab: [
+      { fr: 'Excusez-moi, où est... ?', ph: 'eks-ku-ZEH mwa oo EH', es: 'Perdone, ¿dónde está...?', ex: 'Excusez-moi, où est la pharmacie ?' },
+      { fr: 'Tournez à gauche / droite', ph: 'toor-NEH a GOHSH / drwat', es: 'Gire a la izquierda / derecha', ex: 'Tournez à gauche au feu rouge.' },
+      { fr: 'Tout droit', ph: 'too DRWA', es: 'Todo recto / derecho', ex: 'Allez tout droit pendant 200 mètres.' },
+      { fr: 'C\'est loin / près ?', ph: 'seh LWAN / preh', es: '¿Está lejos / cerca?', ex: 'C\'est loin ? — Non, c\'est à deux minutes !' },
+      { fr: 'Je cherche...', ph: 'juh SHERSH', es: 'Busco...', ex: 'Je cherche la rue de Rivoli.' },
+      { fr: 'Prenez le métro', ph: 'pruh-NEH luh meh-TRO', es: 'Tome el metro', ex: 'Prenez le métro ligne 4 direction Montrouge.' },
+      { fr: 'À pied / en bus', ph: 'a PYEH / on BUS', es: 'A pie / en autobús', ex: 'C\'est à 10 minutes à pied.' },
+      { fr: 'Pouvez-vous répéter ?', ph: 'poo-VEH voo reh-peh-TEH', es: '¿Puede repetir?', ex: 'Pardon, pouvez-vous répéter plus lentement ?' },
+      { fr: 'Je suis perdu(e)', ph: 'juh swee per-DU', es: 'Estoy perdida', ex: 'Je suis perdue ! Pouvez-vous m\'aider ?' },
+      { fr: 'C\'est à quelle distance ?', ph: 'seh ta kel dees-TONS', es: '¿A qué distancia está?', ex: 'La Tour Eiffel, c\'est à quelle distance ?' },
+    ],
+    listen: [
+      { audio: 'Tournez à gauche !', opts: ['Gire a la derecha', 'Vaya todo recto', 'Gire a la izquierda', 'Tome el metro'], correct: 2 },
+      { audio: 'C\'est tout droit.', opts: ['Está a la derecha', 'Está a la izquierda', 'Está lejos', 'Es todo recto'], correct: 3 },
+      { audio: 'Je suis perdue !', opts: ['Estoy cansada', 'Estoy perdida', 'Estoy buscando', 'Estoy llegando'], correct: 1 },
+      { audio: 'C\'est à dix minutes à pied.', opts: ['Son 10 minutos en metro', 'Son 10 minutos en bus', 'Son 10 minutos a pie', 'Está a 10 km'], correct: 2 },
+      { audio: 'Pouvez-vous répéter, s\'il vous plaît ?', opts: ['¿Puede ir más rápido?', '¿Puede repetir?', '¿Puede escribirlo?', '¿Habla español?'], correct: 1 },
+    ],
+    quiz: [
+      { q: '¿Cómo preguntas dónde está la farmacia?', opts: ['Où est la pharmacie ?', 'La pharmacie est où ?', 'Excusez-moi, où est la pharmacie ?', 'Cherche pharmacie.'], correct: 2, expl: 'Empezar con EXCUSEZ-MOI es esencial en Francia. Los franceses valoran mucho la educación al dirigirse a desconocidos.' },
+      { q: '"Tournez à gauche" significa...', opts: ['Gire a la derecha', 'Vaya recto', 'Gire a la izquierda', 'Dé la vuelta'], correct: 2, expl: 'GAUCHE = izquierda. DROITE = derecha. Memoria: Gauche = "goosh" (suena extraño = izquierda = el lado menos común).' },
+      { q: 'Para decir "estoy perdida" (mujer):...', opts: ['Je suis perdu', 'Je suis perdue', 'J\'ai perdu', 'Je me perds'], correct: 1, expl: 'PERDU (masculino) / PERDUE (femenino). Como eres mujer, siempre dices "perdue" con la -e final.' },
+      { q: '"Tout droit" significa...', opts: ['A la derecha', 'A la izquierda', 'Todo recto', 'Dé la vuelta'], correct: 2, expl: 'TOUT DROIT = todo recto, derecho. No confundir con "à droite" (a la derecha).' },
+      { q: '¿Cómo pides que repitan más despacio?', opts: ['Plus vite, s\'il vous plaît', 'Pouvez-vous répéter plus lentement ?', 'Je ne comprends rien', 'Parlez français !'], correct: 1, expl: 'PLUS LENTEMENT = más despacio/lentamente. LENT = lento. MU importante cuando no entiendes.' },
+    ],
+    conversation: {
+      scene: '🗺️ Perdida en el barrio Marais',
+      bubbles: [
+        { who: 'lis', avatar: '👩', fr: 'Excusez-moi ! Je suis perdue. Où est le métro ?', es: '¡Perdone! Estoy perdida. ¿Dónde está el metro?' },
+        { who: 'passant', avatar: '🧑', fr: 'Le métro ? C\'est par là. Tournez à droite, puis tout droit.', es: '¿El metro? Es por allá. Gire a la derecha, luego todo recto.' },
+        { who: 'lis', avatar: '👩', fr: 'C\'est loin ?', es: '¿Está lejos?' },
+        { who: 'passant', avatar: '🧑', fr: 'Non, c\'est à cinq minutes à pied.', es: 'No, está a cinco minutos a pie.' },
+        { who: 'lis', avatar: '👩', fr: 'Pardon, pouvez-vous répéter plus lentement ?', es: 'Perdón, ¿puede repetir más despacio?' },
+        { who: 'passant', avatar: '🧑', fr: 'Bien sûr ! Tournez à DROITE, puis tout DROIT.', es: '¡Claro! Gire a la DERECHA, luego todo RECTO.' },
+        { who: 'lis', avatar: '👩', fr: 'Merci beaucoup, vous êtes très gentil !', es: '¡Muchísimas gracias, es usted muy amable!' },
+      ]
+    },
+    fill: [
+      { sentence: 'Excusez-moi, _____ est la pharmacie ?', blank: 'où', hint: 'La palabra para "dónde"', expl: 'OÙ = dónde. Excusez-moi, où est...? = Perdone, ¿dónde está...?' },
+      { sentence: 'Tournez à _____, puis tout droit.', blank: 'gauche', hint: 'Gire a la... izquierda', expl: 'GAUCHE = izquierda. DROITE = derecha. ¡A confundirlas!' },
+      { sentence: 'C\'est à cinq minutes à _____.', blank: 'pied', hint: 'A pie, caminando', expl: 'À PIED = a pie. C\'est à 5 minutes à pied = está a 5 minutos caminando.' },
+      { sentence: 'Je suis _____ !', blank: 'perdue', hint: 'Estoy perdida (femenino)', expl: 'PERDUE = perdida (femenino). PERDU = perdido (masculino). El francés concuerda en género.' },
+    ]
+  }
+];
+
+// ═══════════════════════════════════════════════
+// RENDU
+// ═══════════════════════════════════════════════
+function render() {
+  document.getElementById('xp-display').textContent = state.xp + ' XP';
+  const c = document.getElementById('content');
+  if (state.screen === 'home') renderHome(c);
+  else if (state.screen === 'lesson') renderLesson(c);
+}
+
+function renderHome(c) {
+  const unitsHTML = UNITS.map((u, i) => {
+    const prog = state.progress[u.id] || 0;
+    const totalSteps = u.steps.length - 1;
+    const pct = Math.round((prog / totalSteps) * 100);
+    const badge = pct >= 100 ? '<span class="unit-badge badge-done">✓ Completado</span>'
+                : pct > 0 ? '<span class="unit-badge badge-new">En progreso</span>'
+                : '';
+    return `<div class="unit-card" onclick="startUnit('${u.id}')">
+      <div class="unit-icon">${u.icon}</div>
+      <div class="unit-info">
+        <h3>${u.title} ${badge}</h3>
+        <p>${u.desc}</p>
+        <div class="unit-bar"><div class="unit-bar-fill" style="width:${pct}%"></div></div>
+      </div>
+    </div>`;
+  }).join('');
+  c.innerHTML = `<div class="home-header"><h2>¡Hola, Lis! 🌟</h2><p>Elige la unidad que quieras — en el orden que prefieras.</p></div><div class="unit-list">${unitsHTML}</div>`;
+}
+
+function startUnit(id) {
+  state.currentUnit = UNITS.find(u => u.id === id);
+  state.currentStep = state.progress[id] || 0;
+  if (state.currentStep >= state.currentUnit.steps.length - 1) state.currentStep = 0;
+  state.score = 0;
+  state.answered = false;
+  state.screen = 'lesson';
+  render();
+}
+
+function renderLesson(c) {
+  const u = state.currentUnit;
+  const stepName = u.steps[state.currentStep];
+  const totalSteps = u.steps.length - 1;
+  const pct = Math.round((state.currentStep / totalSteps) * 100);
+  const progressBar = `<div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>`;
+  const backBtn = `<button class="back-btn" onclick="goHome()">← Inicio</button>`;
+
+  c.innerHTML = '';
+
+  if (stepName === 'intro') renderIntro(c, u, progressBar, backBtn);
+  else if (stepName === 'vocab') renderVocab(c, u, progressBar, backBtn);
+  else if (stepName === 'listen') renderListen(c, u, progressBar, backBtn);
+  else if (stepName === 'pronun') renderPronun(c, u, progressBar, backBtn);
+  else if (stepName === 'quiz') renderQuiz(c, u, progressBar, backBtn);
+  else if (stepName === 'conversation') renderConvo(c, u, progressBar, backBtn);
+  else if (stepName === 'fill') renderFill(c, u, progressBar, backBtn);
+  else if (stepName === 'end') renderEnd(c, u);
+}
+
+function renderIntro(c, u, pb, back) {
+  const intro = u.intro;
+  const sections = intro.sections.map(s => {
+    let extra = '';
+    if (s.audio) {
+      extra = `<div class="sound-row">${s.audio.map(w => `<span class="sound-chip" onclick="speak('${w}')"">🔊 ${w}</span>`).join('')}</div>`;
+    }
+    return `<div class="intro-section"><h3>${s.icon} ${s.title}</h3>${s.html}${extra}</div>`;
+  }).join('');
+  c.innerHTML = `<div class="lesson-header">${back}<div><div class="lesson-title">${u.title}</div><div class="lesson-subtitle">Introducción</div></div></div>${pb}${sections}<button class="next-lesson-btn" onclick="nextStep()">Empezar los ejercicios →</button>`;
+}
+
+function renderVocab(c, u, pb, back) {
+  const cards = u.vocab.map(v => `
+    <div class="vocab-card">
+      <div class="fr">${v.fr} <button class="speak-btn" onclick="speak('${v.fr.replace(/'/g,"\\'")}')">🔊</button></div>
+      <div class="phonetic">${v.ph}</div>
+      <div class="es">${v.es}</div>
+      <div class="example">${v.ex} <button class="speak-btn" style="font-size:14px" onclick="speak('${v.ex.replace(/'/g,"\\'")}', 0.8)">🔊</button></div>
+    </div>`).join('');
+  c.innerHTML = `<div class="lesson-header">${back}<div><div class="lesson-title">${u.title}</div><div class="lesson-subtitle">📚 Vocabulario — escucha y aprende</div></div></div>${pb}<div class="vocab-grid">${cards}</div><button class="next-lesson-btn" onclick="nextStep()">Continuar →</button>`;
+}
+
+let listenQ = 0, listenAnswered = false;
+function renderListen(c, u, pb, back) {
+  listenQ = 0; listenAnswered = false;
+  renderListenQ(c, u, pb, back);
+}
+function renderListenQ(c, u, pb, back) {
+  const q = u.listen[listenQ];
+  const opts = q.opts.map((o, i) => `<button class="listen-opt" id="lo${i}" onclick="checkListen(${i}, ${q.correct}, ${JSON.stringify(q.opts).replace(/"/g,"'")})">${o}</button>`).join('');
+  c.innerHTML = `<div class="lesson-header">${back}<div><div class="lesson-title">${u.title}</div><div class="lesson-subtitle">🎧 Escucha — ¿qué significa?</div></div></div>${pb}
+  <div class="listen-card">
+    <button class="big-play" onclick="speak('${q.audio.replace(/'/g,"\\'")}', 0.75)">▶</button>
+    <div style="font-size:13px;color:var(--muted)">Toca ▶ para escuchar, luego elige la traducción correcta</div>
+  </div>
+  <div class="listen-options">${opts}</div>
+  <div class="feedback-box" id="listen-fb" style="display:none"></div>
+  <button class="next-lesson-btn" id="listen-next" style="display:none" onclick="nextListenQ(${u.listen.length})">Siguiente →</button>`;
+  listenAnswered = false;
+  setTimeout(() => speak(q.audio, 0.75), 400);
+}
+function checkListen(sel, correct, opts) {
+  if (listenAnswered) return;
+  listenAnswered = true;
+  document.querySelectorAll('.listen-opt').forEach((b,i) => {
+    b.disabled = true;
+    if (i === correct) b.classList.add('correct');
+    else if (i === sel) b.classList.add('wrong');
+  });
+  const fb = document.getElementById('listen-fb');
+  fb.style.display = 'block';
+  if (sel === correct) { fb.className = 'feedback-box ok'; fb.textContent = '✓ ¡Correcto!'; addXP(5); }
+  else { fb.className = 'feedback-box ko'; fb.textContent = '✗ La respuesta era: ' + opts[correct]; }
+  document.getElementById('listen-next').style.display = 'block';
+}
+function nextListenQ(total) {
+  listenQ++;
+  if (listenQ >= total) { nextStep(); return; }
+  const u = state.currentUnit;
+  const pb = `<div class="progress-bar"><div class="progress-fill" style="width:${Math.round((state.currentStep/(state.currentUnit.steps.length-1))*100)}%"></div></div>`;
+  renderListenQ(document.getElementById('content'), u, pb, `<button class="back-btn" onclick="goHome()">← Inicio</button>`);
+}
+
+function renderPronun(c, u, pb, back) {
+  const items = u.pronun.map(p => `
+    <div class="pronun-card">
+      <div class="target">${p.word}</div>
+      <div class="phonetic-big">${p.ph}</div>
+      <div class="pronun-tip">💡 ${p.tip}</div>
+      <div class="sound-row">${p.sounds.map(s => `<span class="sound-chip" onclick="speak('${s.replace(/'/g,"\\'")}', 0.7)">🔊 ${s}</span>`).join('')}</div>
+    </div>`).join('');
+  c.innerHTML = `<div class="lesson-header">${back}<div><div class="lesson-title">${u.title}</div><div class="lesson-subtitle">🗣️ Pronunciación — escucha y repite</div></div></div>${pb}${items}<button class="next-lesson-btn" onclick="nextStep()">Continuar →</button>`;
+}
+
+let quizQ = 0, quizAnswered = false, quizScore = 0;
+function renderQuiz(c, u, pb, back) {
+  quizQ = 0; quizAnswered = false; quizScore = 0;
+  renderQuizQ(c, u, pb, back);
+}
+function renderQuizQ(c, u, pb, back) {
+  const q = u.quiz[quizQ];
+  const opts = q.opts.map((o, i) => `<button class="opt-btn" id="qo${i}" onclick="checkQuiz(${i}, ${q.correct})">${o}</button>`).join('');
+  c.innerHTML = `<div class="lesson-header">${back}<div><div class="lesson-title">${u.title}</div><div class="lesson-subtitle">✏️ Pregunta ${quizQ+1}/${u.quiz.length}</div></div></div>${pb}
+  <div class="question-box"><div class="question-text">${q.q}</div></div>
+  <div class="options-list">${opts}</div>
+  <div class="feedback-box" id="quiz-fb" style="display:none"></div>
+  <button class="next-lesson-btn" id="quiz-next" style="display:none" onclick="nextQuizQ(${u.quiz.length}, '${JSON.stringify(q.expl).replace(/'/g,"\\'")}')">Siguiente →</button>`;
+  quizAnswered = false;
+}
+function checkQuiz(sel, correct) {
+  if (quizAnswered) return;
+  quizAnswered = true;
+  const q = state.currentUnit.quiz[quizQ];
+  document.querySelectorAll('.opt-btn').forEach((b,i) => {
+    b.disabled = true;
+    if (i === correct) b.classList.add('correct');
+    else if (i === sel) b.classList.add('wrong');
+  });
+  const fb = document.getElementById('quiz-fb');
+  fb.style.display = 'block';
+  if (sel === correct) { quizScore++; fb.className = 'feedback-box ok'; fb.textContent = '✓ ¡Muy bien! ' + q.expl; addXP(10); }
+  else { fb.className = 'feedback-box ko'; fb.textContent = '✗ ' + q.expl; }
+  document.getElementById('quiz-next').style.display = 'block';
+}
+function nextQuizQ(total) {
+  quizQ++;
+  if (quizQ >= total) { nextStep(); return; }
+  const u = state.currentUnit;
+  const pb = `<div class="progress-bar"><div class="progress-fill" style="width:${Math.round((state.currentStep/(state.currentUnit.steps.length-1))*100)}%"></div></div>`;
+  renderQuizQ(document.getElementById('content'), u, pb, `<button class="back-btn" onclick="goHome()">← Inicio</button>`);
+}
+
+function renderConvo(c, u, pb, back) {
+  const convo = u.conversation;
+  const bubbles = convo.bubbles.map(b => {
+    const isLis = b.who === 'lis';
+    return `<div class="bubble ${isLis ? 'right' : ''}">
+      <div class="avatar">${b.avatar}</div>
+      <div>
+        <div class="bubble-text">
+          <div class="bubble-fr">${b.fr}</div>
+          <div class="bubble-es">${b.es}</div>
+        </div>
+        <button class="convo-play-btn" onclick="speak('${b.fr.replace(/'/g,"\\'")}', 0.8)">🔊 Escuchar</button>
+      </div>
+    </div>`;
+  }).join('');
+  c.innerHTML = `<div class="lesson-header">${back}<div><div class="lesson-title">${u.title}</div><div class="lesson-subtitle">💬 Conversación real</div></div></div>${pb}
+  <div class="convo-scene"><div class="scene-label">${convo.scene}</div>${bubbles}</div>
+  <button class="next-lesson-btn" onclick="playFullConvo(${JSON.stringify(convo.bubbles.map(b=>b.fr))})">🔊 Escuchar toda la conversación</button>
+  <button class="next-lesson-btn" style="margin-top:8px;background:var(--text)" onclick="nextStep()">Continuar →</button>`;
+}
+function playFullConvo(frases) {
+  let i = 0;
+  function next() { if (i < frases.length) { speak(frases[i], 0.8); i++; setTimeout(next, 2800); } }
+  next();
+}
+
+let fillQ = 0, fillAnswered = false;
+function renderFill(c, u, pb, back) {
+  fillQ = 0; fillAnswered = false;
+  renderFillQ(c, u, pb, back);
+}
+function renderFillQ(c, u, pb, back) {
+  const q = u.fill[fillQ];
+  const display = q.sentence.replace('_____', '<span class="blank">_______</span>');
+  c.innerHTML = `<div class="lesson-header">${back}<div><div class="lesson-title">${u.title}</div><div class="lesson-subtitle">✍️ Completa la frase ${fillQ+1}/${u.fill.length}</div></div></div>${pb}
+  <div class="question-box"><div class="fill-sentence">${display}</div><div class="question-hint">💡 ${q.hint}</div></div>
+  <input class="fill-input" id="fill-in" placeholder="Escribe tu respuesta..." autocomplete="off" autocorrect="off" autocapitalize="off" />
+  <button class="check-btn" onclick="checkFill()">Comprobar ✓</button>
+  <div class="feedback-box" id="fill-fb" style="display:none"></div>
+  <button class="next-lesson-btn" id="fill-next" style="display:none" onclick="nextFillQ(${u.fill.length})">Siguiente →</button>`;
+  fillAnswered = false;
+  document.getElementById('fill-in').addEventListener('keydown', e => { if (e.key === 'Enter') checkFill(); });
+}
+function checkFill() {
+  if (fillAnswered) return;
+  const q = state.currentUnit.fill[fillQ];
+  const input = document.getElementById('fill-in');
+  const val = input.value.trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"");
+  const ans = q.blank.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"");
+  fillAnswered = true;
+  input.disabled = true;
+  const fb = document.getElementById('fill-fb');
+  fb.style.display = 'block';
+  if (val === ans) {
+    input.classList.add('ok');
+    fb.className = 'feedback-box ok';
+    fb.textContent = '✓ ¡Perfecto! ' + q.expl;
+    addXP(10);
+  } else {
+    input.classList.add('ko');
+    fb.className = 'feedback-box ko';
+    fb.textContent = '✗ La respuesta es: ' + q.blank + '. ' + q.expl;
+    speak(q.blank, 0.8);
+  }
+  document.getElementById('fill-next').style.display = 'block';
+}
+function nextFillQ(total) {
+  fillQ++;
+  if (fillQ >= total) { nextStep(); return; }
+  const u = state.currentUnit;
+  const pb = `<div class="progress-bar"><div class="progress-fill" style="width:${Math.round((state.currentStep/(state.currentUnit.steps.length-1))*100)}%"></div></div>`;
+  renderFillQ(document.getElementById('content'), u, pb, `<button class="back-btn" onclick="goHome()">← Inicio</button>`);
+}
+
+function renderEnd(c, u) {
+  const total = u.steps.length - 1;
+  c.innerHTML = `<div class="end-screen">
+    <div style="font-size:3rem;margin-bottom:8px">🎉</div>
+    <div class="end-score">¡Unidad completada!</div>
+    <p class="end-msg"><strong>${u.icon} ${u.title}</strong><br>¡Excelente trabajo, Lis!<br>¡Sigue así!</p>
+    <div class="end-btns">
+      <button class="end-btn primary" onclick="goHome()">← Ver todas las unidades</button>
+      <button class="end-btn secondary" onclick="startUnit('${u.id}')">🔄 Repetir esta unidad</button>
+    </div>
+  </div>`;
+}
+
+function nextStep() {
+  state.currentStep++;
+  const u = state.currentUnit;
+  if (state.currentStep >= u.steps.length - 1) {
+    state.progress[u.id] = u.steps.length - 1;
+    saveState();
+  } else {
+    state.progress[u.id] = Math.max(state.progress[u.id] || 0, state.currentStep);
+    saveState();
+  }
+  render();
+  window.scrollTo(0, 0);
+}
+
+function goHome() {
+  state.screen = 'home';
+  state.currentUnit = null;
+  render();
+  window.scrollTo(0, 0);
+}
+
+// Init
+render();
+</script>
+</body>
+</html>
